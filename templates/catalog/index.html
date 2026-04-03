@@ -1,0 +1,94 @@
+{% extends 'base.html' %} {% block title %}Shop — GroceryMart{% endblock %} {%
+block content %}
+<div class="row">
+  <!-- Sidebar -->
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h5>Filter by Category</h5>
+
+      <a
+        href="{{ url_for('catalog.catalog_index') }}"
+        class="btn btn-sm btn-outline-success mb-1 w-100"
+      >
+        All Products
+      </a>
+
+      {% for cat in categories %}
+      <a
+        href="{{ url_for('catalog.by_slug_root', slug=cat.name.lower()) }}"
+        class="btn btn-sm btn-outline-secondary mb-1 w-100"
+      >
+        {{ cat.name }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Products -->
+  <div class="col-md-9">
+    <form class="d-flex mb-3" method="GET">
+      <input
+        name="q"
+        class="form-control me-2"
+        placeholder="Search products..."
+        value="{{ search_query }}"
+      />
+
+      <select name="sort" class="form-select me-2" style="width: 180px">
+        <option value="name">Name A-Z</option>
+        <option value="price_asc">Price Low-High</option>
+        <option value="price_desc">Price High-Low</option>
+        <option value="newest">Newest</option>
+      </select>
+
+      <button class="btn btn-success">Search</button>
+    </form>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      {% for product in products %}
+      <div class="col">
+        <div class="card product-card h-100">
+          <img
+            src="{{ product.image_url or '/static/images/default.jpg' }}"
+            class="card-img-top"
+          />
+
+          <div class="card-body">
+            <h6>{{ product.name }}</h6>
+            <p class="text-success fw-bold">
+              ₹{{ product.price }}/{{ product.unit }}
+            </p>
+
+            <span
+              class="badge bg-{{ 'success' if product.stock > 0 else 'danger' }} badge-stock"
+            >
+              {{ 'In Stock' if product.stock > 0 else 'Out of Stock' }}
+            </span>
+          </div>
+
+          <div class="card-footer">
+            <a
+              href="/catalog/product/{{ product.id }}"
+              class="btn btn-outline-success btn-sm"
+              >View</a
+            >
+
+            {% if product.stock > 0 %}
+            <form action="/cart/add" method="POST" class="d-inline">
+              <input type="hidden" name="product_id" value="{{ product.id }}" />
+              <input type="hidden" name="quantity" value="1" />
+              <button class="btn btn-success btn-sm">
+                <i class="fas fa-cart-plus"></i> Add
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <p class="text-muted">No products found.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

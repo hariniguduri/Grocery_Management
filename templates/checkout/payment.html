@@ -1,0 +1,65 @@
+{% extends 'base.html' %} {% block title %}Payment — GroceryMart{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div
+      class="card shadow"
+      style="border: none; border-top: 4px solid var(--accent-green)"
+    >
+      <div class="card-body p-4">
+        <h2 class="text-center mb-2">Complete Payment</h2>
+        <p class="text-center text-muted mb-4">
+          Enter your payment details below
+        </p>
+
+        <form method="post" action="{{ url_for('payment.payment') }}">
+          <div class="mb-3">
+            <label for="card_number" class="form-label">Card Number</label>
+            <input
+              type="text"
+              class="form-control"
+              id="card_number"
+              name="card_number"
+              placeholder="1234 5678 9012 3456"
+              required
+            />
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="expiry" class="form-label">Expiry Date</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="expiry"
+                  name="expiry"
+                  placeholder="MM/YY"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="cvv" class="form-label">CVV</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="cvv"
+                  name="cvv"
+                  placeholder="123"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+            <i class="fas fa-lock"></i> Complete Payment
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

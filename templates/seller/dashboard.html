@@ -1,0 +1,230 @@
+{% extends 'base.html' %} {% block title %}Seller Dashboard — GroceryMart{%
+endblock %} {% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h2>
+      <i class="fas fa-store" style="color: var(--primary-green)"></i> Seller
+      Dashboard
+    </h2>
+  </div>
+</div>
+
+<!-- Add Product Form Section -->
+<div class="row mb-5">
+  <div class="col-lg-8">
+    <div
+      class="card shadow-sm"
+      style="border-top: 4px solid var(--accent-green)"
+    >
+      <div class="card-header" style="background-color: var(--light-green)">
+        <h5 class="mb-0">
+          <i class="fas fa-plus-circle" style="color: var(--primary-green)"></i>
+          Add New Product
+        </h5>
+      </div>
+      <div class="card-body">
+        <form
+          method="POST"
+          action="{{ url_for('seller.dashboard') }}"
+          enctype="multipart/form-data"
+        >
+          <div class="mb-3">
+            <label for="product_name" class="form-label">Product Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="product_name"
+              name="name"
+              placeholder="e.g., Fresh Tomatoes"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea
+              class="form-control"
+              id="description"
+              name="description"
+              rows="3"
+              placeholder="Product description"
+            ></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="image" class="form-label">Product Image</label>
+            <input
+              type="file"
+              class="form-control"
+              id="image"
+              name="image"
+              accept="image/*"
+              placeholder="Upload product image"
+            />
+            <small class="text-muted"
+              >Supported: PNG, JPG, JPEG, GIF, WebP (Max 5MB)</small
+            >
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="category_id" class="form-label">Category</label>
+                <select class="form-select" id="category_id" name="category_id">
+                  <option value="">Select a category</option>
+                  {% for cat in categories %}
+                  <option value="{{ cat.id }}">{{ cat.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="price" class="form-label">Price (₹)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="price"
+                  name="price"
+                  step="0.01"
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label for="stock" class="form-label">Stock Quantity</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="stock"
+                  name="stock"
+                  placeholder="0"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+            <i class="fas fa-plus"></i> Add Product
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Stats -->
+  <div class="col-lg-4">
+    <div class="dashboard-stat-card card shadow-sm mb-3">
+      <div class="card-body text-center">
+        <h5 class="text-muted">Total Products</h5>
+        <h2 class="fw-bold" style="color: var(--primary-green)">
+          {{ products | length }}
+        </h2>
+      </div>
+    </div>
+    <div class="dashboard-stat-card card shadow-sm">
+      <div class="card-body text-center">
+        <h5 class="text-muted">Total Stock</h5>
+        <h2 class="fw-bold" style="color: var(--primary-green)">
+          {{ products | map(attribute='stock') | sum | default(0) }}
+        </h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Products List Section -->
+{% if products %}
+<h4
+  class="mb-3"
+  style="
+    border-bottom: 3px solid var(--accent-green);
+    padding-bottom: 10px;
+    display: inline-block;
+  "
+>
+  <i class="fas fa-list" style="color: var(--primary-green)"></i> Your Products
+</h4>
+
+<div class="row">
+  <div class="col-12">
+    <div class="table-responsive">
+      <table class="table table-hover shadow-sm">
+        <thead style="background-color: var(--light-green)">
+          <tr>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Category</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+          <tr>
+            <td>
+              <strong>{{ product.name }}</strong>
+              <br />
+              <small class="text-muted"
+                >{{ product.description[:50] if product.description else 'No
+                description' }}...</small
+              >
+            </td>
+            <td>
+              <strong style="color: var(--primary-green)"
+                >₹{{ product.price }}</strong
+              >
+            </td>
+            <td>
+              {% if product.stock > 0 %}
+              <span class="badge bg-success">{{ product.stock }}</span>
+              {% else %}
+              <span class="badge bg-danger">Out of Stock</span>
+              {% endif %}
+            </td>
+            <td>
+              <small class="text-muted"
+                >{{ product.category_id | default('Uncategorized') }}</small
+              >
+            </td>
+            <td>
+              <button
+                class="btn btn-sm btn-outline-warning me-2"
+                title="Edit"
+                onclick="alert('Edit feature coming soon')"
+              >
+                <i class="fas fa-edit"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                title="Delete"
+                onclick="alert('Delete feature coming soon')"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info text-center py-5" role="alert">
+  <i
+    class="fas fa-box-open"
+    style="font-size: 2.5rem; color: var(--primary-green)"
+  ></i>
+  <h5 class="mt-3">No Products Yet</h5>
+  <p class="text-muted">
+    Start by adding your first product using the form above.
+  </p>
+</div>
+{% endif %} {% endblock %}

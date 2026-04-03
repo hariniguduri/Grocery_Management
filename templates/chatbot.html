@@ -1,0 +1,84 @@
+{% extends 'base.html' %} {% block title %}Chatbot — GroceryMart{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h4 class="mb-0">GroceryMart Chat Assistant</h4>
+      </div>
+      <div class="card-body p-0">
+        <div
+          id="chat-box"
+          class="p-3"
+          style="height: 420px; overflow-y: auto; background: #f8f9fa"
+        >
+          <div class="text-muted">
+            Welcome! Ask questions about products, your cart, checkout, or
+            account.
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <form id="chat-form" class="d-flex gap-2">
+          <input
+            id="chat-input"
+            name="message"
+            type="text"
+            class="form-control"
+            placeholder="Type your question..."
+            autocomplete="off"
+          />
+          <button class="btn btn-success" type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const chatBox = document.getElementById("chat-box");
+    const chatForm = document.getElementById("chat-form");
+    const chatInput = document.getElementById("chat-input");
+
+    function appendMessage(text, sender) {
+      const wrapper = document.createElement("div");
+      wrapper.className =
+        sender === "user" ? "text-end mb-3" : "text-start mb-3";
+      wrapper.innerHTML = `
+        <div class="d-inline-block px-3 py-2 rounded ${sender === "user" ? "bg-success text-white" : "bg-white text-dark border"}" style="max-width: 100%;">
+          ${text}
+        </div>
+      `;
+      chatBox.appendChild(wrapper);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    chatForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const message = chatInput.value.trim();
+      if (!message) {
+        return;
+      }
+
+      appendMessage(message, "user");
+      chatInput.value = "";
+
+      const response = await fetch("/chat/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        appendMessage(data.message, "bot");
+      } else {
+        appendMessage(data.error || "Sorry, something went wrong.", "bot");
+      }
+    });
+  });
+</script>
+{% endblock %}
